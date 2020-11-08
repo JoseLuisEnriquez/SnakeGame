@@ -153,13 +153,6 @@ function act(){
         if(body[0].y < 0){
             body[0].y = canvas.height - body[0].height;
         }
-        //Food intersects
-        if(body[0].intersects(food)){
-            score += 1;
-            food.x = random(canvas.width / 10 - 1) * 10;
-            food.y = random(canvas.height / 10 - 1) * 10;
-            aEat.play();
-        }
         //Body intersects
         for (i = 2, l = body.length; i < l; i += 1){
             if(body[0].intersects(body[i])){
@@ -167,6 +160,14 @@ function act(){
                 pause = true;
                 aDie.play();
             }
+        }
+        //Food intersects
+        if(body[0].intersects(food)){
+            body.push(new Rectangle(food.x, food.y, 10, 10));
+            score += 1;
+            food.x = random(canvas.width / 10 - 1) * 10;
+            food.y = random(canvas.height / 10 - 1) * 10;
+            aEat.play();
         }
         //Wall intersects
         /*
