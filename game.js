@@ -15,7 +15,13 @@
         iBody = new Image(),
         iFood = new Image(),
         aEat = new Audio(),
-        aDie = new Audio;
+        aDie = new Audio,
+        lastUpdate = 0,
+        fps = 0,
+        frames = 0,
+        acumDelta =0,
+        x = 50,
+        y = 50;
 
     window.requestAnimationFrame = (function(){
         return window.requestAnimationFrame ||
@@ -129,6 +135,8 @@
             }
             ctx.textAling = 'left';
         }
+        //FPS
+        ctx.fillText('FPS: ' + fps, 10, 20);
     }
 
     function act(){
@@ -224,8 +232,22 @@
     }
 
     function run(){
-        setTimeout(run, 50);
+        window.requestAnimationFrame(run);
+        var now = Date.now(),
+        deltaTime = (now - lastUpdate) / 1000;
+        if(deltaTime > 1){
+            deltaTime = 0;
+        }
+        lastUpdate = now;
+        frames += 1;
+        acumDelta += deltaTime;
+        if(acumDelta > 1){
+            fps = frames;
+            frames = 0;
+            acumDelta -= 1;
+        }
         act();
+        paint(ctx);
     }
 
     function init(){
