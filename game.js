@@ -145,7 +145,7 @@
         ctx.fillText('Press Enter', 150, 90);
     };
 
-    mainScene.act() = function(){
+    mainScene.act = function(){
         //Load next scene
         if(lastPress === key_enter){
             loadScene(gameScene);
