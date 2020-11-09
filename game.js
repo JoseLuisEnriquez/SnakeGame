@@ -5,16 +5,19 @@
         canvas = null,
         ctx = null,
         lastPress = null,
-        pause = true,
-        gameover = true,
+        pause = false,
+        gameover = false,
         currentScene = 0,
         scenes = [],
         mainScene = null,
         gameScene = null,
+        highScoreScene = null,
         dir = 0,
         score = 0,
         food = null,
-        //wall = new Array();
+        //wall = [],
+        highScores = [],
+        posHighScores = 10,
         body = [],
         iBody = new Image(),
         iFood = new Image(),
@@ -97,6 +100,18 @@
         return ~~(Math.random() * max);
     }
 
+    function addHighScore(score){
+        posHighScores = 0;
+        while (highScores[posHighScores] > score && posHighScores < highScores.length){
+            posHighScores += 1;
+        }
+        highScores.splice(posHighScores, 0, score);
+        if(highScores.length > 10){
+            highScores.length = 10;
+        }
+        localStorage.highScores = highScores.join(',');
+    }
+
     function repaint(){
         window.requestAnimationFrame(repaint);
         if (scenes.length){
@@ -127,6 +142,10 @@
         //wall.push(new Rectangle(100, 100, 10, 10));
         //wall.push(new Rectangle(200, 50, 10, 10));
         //wall.push(new Rectangle(200, 100, 10, 10));
+        //Load saved highscores
+        if(localStorage.highScores){
+            highScores = localStorage.highScores.split(',');
+        }
         //Start game
         run();
         repaint();
@@ -279,12 +298,44 @@
                     gameover = true;
                     pause = true;
                     aDie.play();
+                    addHighScore(score);
+                    loadScene(highScoreScene);
                 }
             }
         }
         //Pause / Unpaused
         if(lastPress === key_enter){
             pause = !pause;
+            lastPress = null;
+        }
+    };
+
+    //Highscore scene
+    highScoreScene = new Scene();
+    highScoreScene.paint = function(ctx){
+        var i = 0, l = 0;
+        //Clean canvas
+        ctx.fillStyle = '#030';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        //Draw title
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText('HIGH SCORES', 150, 30);
+        //Draw highscores
+        ctx.textAlign = 'right';
+        for (i = 0, l = highScores.length; i < l; i += 1){
+            if(i === posHighScores){
+                ctx.fillText('*' + highScores[i], 180, 40 + i * 10);
+            } else {
+                ctx.fillText(highScores[i], 180, 40 + i * 10);
+            }
+        }
+    };
+
+    highScoreScene.act = function(){
+        //Load next scene
+        if(lastPress === key_enter){
+            loadScene(gameScene);
             lastPress = null;
         }
     };
