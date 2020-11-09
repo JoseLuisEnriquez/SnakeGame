@@ -4,9 +4,15 @@
     var key_left = 37, key_up = 38, key_right = 39, key_down = 40, key_enter = 13,
         canvas = null,
         ctx = null,
+        buffer = null,
+        bufferCtx = null,
+        bufferScale = 1,
+        bufferOffSetX = 0,
+        bufferOffSetY = 0,
         lastPress = null,
         pause = true,
         gameover = true,
+        fullScreen = 0,
         dir = 0,
         score = 0,
         food = null,
@@ -33,6 +39,9 @@
     }());
 
     document.addEventListener('keydown', function(evt){
+        if(evt.which >= 37 && evt.which <= 40){
+            evt.preventDefault();
+        }
         lastPress = evt.which;
     }, false);
 
@@ -79,6 +88,16 @@
         return ~~(Math.random() * max);
     }
 
+    function resize(){
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        var w = window.innerWidth / buffer.width;
+        var h = window.innerHeight / buffer.height;
+        bufferScale = Math.min(w, h);
+        bufferOffSetX = (canvas.width - (buffer.width * bufferScale)) / 2;
+        bufferOffSetY = (canvas.height -(buffer.height * bufferScale)) / 2;
+    }
+
     function canPlayOgg(){
         var aud = new Audio();
         if(aud.canPlayType('sounds/ogg').replace(/no/, '')){
@@ -105,7 +124,7 @@
             l = 0;
         //Clean canvas
         ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, buffer.width, buffer.height);
         //Draw player
         ctx.strokeStyle = '#0f0';
         for (i = 0, l = body.length; i < l; i += 1){
@@ -202,8 +221,8 @@
             if(body[0].intersects(food)){
                 body.push(new Rectangle(food.x, food.y, 10, 10));
                 score += 1;
-                food.x = random(canvas.width / 10 - 1) * 10;
-                food.y = random(canvas.height / 10 - 1) * 10;
+                food.x = random(buffer.width / 10 - 1) * 10;
+                food.y = random(buffer.height / 10 - 1) * 10;
                 aEat.play();
             }
             //Wall intersects
@@ -228,7 +247,11 @@
 
     function repaint(){
         window.requestAnimationFrame(repaint);
-        paint(ctx);
+        paint(bufferCtx);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(buffer, bufferOffSetX, bufferOffSetY, buffer.width * bufferScale, buffer.height * bufferScale);
     }
 
     function run(){
@@ -250,18 +273,15 @@
         paint(ctx);
     }
 
-    function resize(){
-        var w = window.innerWidth / canvas.width;
-        var h = window.innerHeight / canvas.height;
-        var scale = Math.min(w, h);
-        canvas.style.width = (canvas.width * scale) + 'px';
-        canvas.style.height = (canvas.height * height) + 'px';
-    }
-
     function init(){
         //Get canvas and context
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
+        //Load buffers
+        buffer = document.createElement('canvas');
+        bufferCtx = buffer.getContext('2d');
+        buffer.width = 300;
+        buffer.height = 150;
         //Load assets
         iBody.src = 'images/body.png';
         iFood.src = 'images/food.png';
