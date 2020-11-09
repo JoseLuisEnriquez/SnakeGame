@@ -250,6 +250,14 @@
         paint(ctx);
     }
 
+    function resize(){
+        var w = window.innerWidth / canvas.width;
+        var h = window.innerHeight / canvas.height;
+        var scale = Math.min(w, h);
+        canvas.style.width = (canvas.width * scale) + 'px';
+        canvas.style.height = (canvas.height * height) + 'px';
+    }
+
     function init(){
         //Get canvas and context
         canvas = document.getElementById('canvas');
@@ -274,7 +282,9 @@
         //Start game
         run();
         repaint();
+        resize();
     }
 
     window.addEventListener('load', init, false);
+    window.addEventListener('resize', resize, false);
 }(window));
