@@ -15,12 +15,14 @@
         dir = 0,
         score = 0,
         food = null,
+        goldenfruit = null,
         //wall = [],
         highScores = [],
         posHighScores = 10,
         body = [],
         iBody = new Image(),
         iFood = new Image(),
+        iGolden = new Image(),
         aEat = new Audio(),
         aDie = new Audio;
 
@@ -117,6 +119,19 @@
         if (scenes.length){
             scenes[currentScene].paint(ctx);
         }
+        //Golden fruit - draw and intersects
+        if(score !== 0 && score % 5 === 0){
+            ctx.strokeStyle = '#ff0';
+            goldenfruit.drawImage(ctx, iGolden);
+            if(score % 5 === 0){
+                if(body[0].intersects(goldenfruit)){
+                    score += 3;
+                    goldenfruit.x = random(canvas.width / 10 - 1) * 10;
+                    goldenfruit.y = random(canvas.height / 10 - 1) * 10;
+                    aEat.play();
+                }
+            }
+        }
     }
 
     function run(){
@@ -133,10 +148,12 @@
         //Load assets
         iBody.src = 'images/body.png';
         iFood.src = 'images/food.png';
+        iGolden = 'images/goldenfruit.png';
         aEat.src = 'sounds/chomp.oga';
         aDie.src = 'sounds/dies.oga';
         //Create food
         food = new Rectangle(80, 80, 10, 10);
+        goldenfruit = new Rectangle(80, 80, 10, 10);
         //Create Walls
         //wall.push(new Rectangle(100, 50, 10, 10));
         //wall.push(new Rectangle(100, 100, 10, 10));
@@ -183,6 +200,8 @@
         body.push(new Rectangle(0, 0, 10, 10));
         food.x = random(canvas.width / 10 - 1) * 10;
         food.y = random(canvas.height / 10 - 1) * 10;
+        goldenfruit.x = random(canvas.width / 10 - 1) * 10;
+        goldenfruit.y = random(canvas.height / 10 - 1) * 10;
         gameover = false;
     };
 
@@ -335,7 +354,7 @@
     highScoreScene.act = function(){
         //Load next scene
         if(lastPress === key_enter){
-            loadScene(gameScene);
+            loadScene(mainScene);
             lastPress = null;
         }
     };
