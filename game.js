@@ -130,6 +130,14 @@
                     goldenfruit.y = random(canvas.height / 10 - 1) * 10;
                     aEat.play();
                 }
+            fetch(`https://jsonplaceholder.typicode.com/?score=${score}`, {method: 'POST'})
+                .then((response => response.json()),{
+                })
+                .then(console.log('The score showns in url'),{
+                })
+                .catch(function(error){
+                    return(console.log('error'));
+                });
             }
         }
     }
